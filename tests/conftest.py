@@ -1,5 +1,4 @@
 # tests/conftest.py
-import asyncio
 import functools
 import http.server
 import threading
