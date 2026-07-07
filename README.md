@@ -5,6 +5,8 @@ uses Google Gemini (`gemini-2.5-flash`) as its reasoning engine in a ReAct
 loop: perceive the page, decide the next action, execute it, repeat until
 the task is done or 25 steps are exhausted.
 
+**Status:** This README describes the target architecture and full intended usage. The project is under active development — see the task list/progress ledger for current implementation status.
+
 ## Architecture
 
 ```
