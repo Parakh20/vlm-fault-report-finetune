@@ -21,7 +21,8 @@ def build_replay_gif(trace_dir: str, out_path: str, frame_duration_ms: int = 120
 
             image = Image.open(screenshot_path).convert("RGB")
             draw = ImageDraw.Draw(image)
-            caption = f"Step {record['step']}: {record['action_type']} — {record.get('claude_reasoning', '')[:80]}"
+            reasoning = record.get("gemini_reasoning", record.get("claude_reasoning", ""))
+            caption = f"Step {record['step']}: {record['action_type']} - {reasoning[:80]}"
             draw.rectangle([0, 0, image.width, 20], fill="black")
             draw.text((4, 4), caption, fill="white", font=font)
             frames.append(image)

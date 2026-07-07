@@ -34,3 +34,27 @@ def test_build_replay_gif_creates_file_with_one_frame_per_step(tmp_path):
     with Image.open(out_path) as gif:
         frame_count = gif.n_frames
     assert frame_count == 3
+
+
+def test_build_replay_gif_accepts_gemini_reasoning_field(tmp_path):
+    # Arrange
+    trace_dir = str(tmp_path / "session")
+    os.makedirs(trace_dir, exist_ok=True)
+    img_path = os.path.join(trace_dir, "step_1.png")
+    Image.new("RGB", (100, 80), color=(20, 0, 0)).save(img_path)
+    with open(os.path.join(trace_dir, "trace.jsonl"), "w") as f:
+        record = {
+            "step": 1,
+            "action_type": "click",
+            "gemini_reasoning": "reason 1",
+            "screenshot_path": img_path,
+        }
+        f.write(json.dumps(record) + "\n")
+    out_path = str(tmp_path / "replay.gif")
+
+    # Act
+    result_path = build_replay_gif(trace_dir, out_path)
+
+    # Assert
+    assert result_path == out_path
+    assert os.path.exists(out_path)
