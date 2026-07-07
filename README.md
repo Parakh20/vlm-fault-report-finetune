@@ -5,7 +5,12 @@ uses Google Gemini (`gemini-2.5-flash`) as its reasoning engine in a ReAct
 loop: perceive the page, decide the next action, execute it, repeat until
 the task is done or 25 steps are exhausted.
 
-**Status:** This README describes the target architecture and full intended usage. The project is under active development — see the task list/progress ledger for current implementation status.
+**Status:** All 23 planned implementation tasks are merged on
+`feat/autonomous-web-agent`. Unit/integration tests pass locally. A live
+single-task Gemini smoke test completed `https://example.com` successfully.
+The full 25-task live benchmark has not been run because the available
+Gemini free-tier key hit its daily request quota; benchmark results are
+pending a funded or non-exhausted key.
 
 ## Architecture
 
@@ -32,7 +37,13 @@ Task → ReAct Loop → [Perceive page (DOM + a11y tree + screenshot)
 
 ## Benchmark Results
 
-See `results/summary.txt` after running `python scripts/run_benchmark.py`.
+No full benchmark results exist yet. `scripts/run_benchmark.py` is
+implemented and unit-tested, but the live 25-task run costs real Gemini
+requests and was intentionally left unrun after a one-task smoke hit
+`429 RESOURCE_EXHAUSTED` on the free-tier `gemini-2.5-flash` quota.
+
+After running with a funded/non-exhausted key, see `results/summary.txt` and
+`results/benchmark_summary.csv`.
 
 ## Example: running a single task
 
@@ -42,7 +53,9 @@ python scripts/run_task.py "Go to Hacker News and summarize today's #1 story" --
 ```
 
 Watch a Chromium window perform the task live (headless is off by default).
-A trace with one screenshot per step is saved under `results/traces/`.
+The CLI prints the final result, step count, token count, duration, and final
+URL. Per-step screenshots are retained in the returned `AgentRun`; persistent
+JSONL traces are produced by the benchmark runner via `observability.Tracer`.
 
 ## Technical Highlights
 
