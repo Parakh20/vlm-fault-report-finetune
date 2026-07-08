@@ -21,7 +21,7 @@ async def run_task(
     max_steps: int | None = None,
 ) -> AgentRun:
     settings = load_settings()
-    session = BrowserSession()
+    session = BrowserSession(engine=settings.browser_engine)
     await session.start(headless=headless)
     try:
         reasoner = WebAgentReasoner(settings)

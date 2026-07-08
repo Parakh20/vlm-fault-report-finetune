@@ -38,6 +38,37 @@ def test_log_step_saves_screenshot_when_present(tmp_path):
     assert os.path.exists(screenshot_path)
 
 
+def test_log_step_computes_dom_diff_across_calls(tmp_path):
+    # Arrange
+    tracer = Tracer(session_id="test-session", base_dir=str(tmp_path))
+    result = ActionResult(success=True, new_url="http://x/", error=None, screenshot_b64="")
+
+    # Act
+    tracer.log_step(1, "http://x/", "navigate_to", {}, result, "t", 1, elements=["a", "b"])
+    tracer.log_step(2, "http://x/", "click", {}, result, "t", 1, elements=["a", "c"])
+
+    # Assert
+    with open(tracer.trace_path) as f:
+        lines = [json.loads(line) for line in f if line.strip()]
+
+    assert lines[0]["dom_diff"] is None  # nothing to diff against on the first step
+    assert lines[1]["dom_diff"] == {"added": ["c"], "removed": ["b"]}
+
+
+def test_log_step_omits_dom_diff_when_elements_not_provided(tmp_path):
+    # Arrange
+    tracer = Tracer(session_id="test-session", base_dir=str(tmp_path))
+    result = ActionResult(success=True, new_url="http://x/", error=None, screenshot_b64="")
+
+    # Act
+    tracer.log_step(1, "http://x/", "navigate_to", {}, result, "t", 1)
+
+    # Assert
+    with open(tracer.trace_path) as f:
+        line = json.loads(f.readline())
+    assert line["dom_diff"] is None
+
+
 def test_log_step_prints_live_summary(tmp_path, capsys):
     # Arrange
     tracer = Tracer(session_id="test-session", base_dir=str(tmp_path))

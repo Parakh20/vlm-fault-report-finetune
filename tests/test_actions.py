@@ -30,7 +30,12 @@ def test_action_schemas_include_all_required_actions():
 
 def test_text_returning_actions_are_exported_for_reasoning_loop():
     # Assert
-    assert _TEXT_RETURNING == {"get_page_text", "search_web", "extract_table"}
+    assert _TEXT_RETURNING == {
+        "get_page_text",
+        "search_web",
+        "extract_table",
+        "extract_from_urls",
+    }
 
 
 @pytest.mark.asyncio

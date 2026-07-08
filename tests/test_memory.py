@@ -56,3 +56,75 @@ def test_recent_history_text_returns_last_n_entries_only():
     # Assert
     assert "action_7" in text
     assert "action_2" not in text
+
+
+def test_record_action_failure_is_tracked_separately():
+    # Arrange
+    memory = TaskMemory()
+
+    # Act
+    memory.record_action("click", "failed", "http://example.com/page1", error="element not found")
+
+    # Assert
+    assert len(memory.failures) == 1
+    assert memory.failures[0]["action"] == "click"
+    assert memory.failures[0]["error"] == "element not found"
+
+
+def test_record_action_success_does_not_add_to_failures():
+    # Arrange
+    memory = TaskMemory()
+
+    # Act
+    memory.record_action("click", "success", "http://example.com/page1")
+
+    # Assert
+    assert memory.failures == []
+
+
+def test_is_repeating_failure_true_after_threshold_consecutive_failures():
+    # Arrange
+    memory = TaskMemory()
+    memory.record_action("click", "failed", "http://x", error="not found")
+    memory.record_action("click", "failed", "http://x", error="not found")
+
+    # Act / Assert
+    assert memory.is_repeating_failure("click") is True
+
+
+def test_is_repeating_failure_false_when_different_actions_fail():
+    # Arrange
+    memory = TaskMemory()
+    memory.record_action("click", "failed", "http://x", error="not found")
+    memory.record_action("scroll", "failed", "http://x", error="timeout")
+
+    # Act / Assert
+    assert memory.is_repeating_failure("click") is False
+
+
+def test_record_fact_and_facts_text():
+    # Arrange
+    memory = TaskMemory()
+
+    # Act
+    memory.record_fact("price", "$42")
+
+    # Assert
+    assert memory.extracted_data["price"] == "$42"
+    assert "price: $42" in memory.facts_text()
+
+
+def test_facts_text_empty_when_no_facts_recorded():
+    # Arrange
+    memory = TaskMemory()
+
+    # Act / Assert
+    assert memory.facts_text() == ""
+
+
+def test_goal_defaults_to_empty_and_can_be_set():
+    # Arrange / Act
+    memory = TaskMemory(goal="find the price")
+
+    # Assert
+    assert memory.goal == "find the price"

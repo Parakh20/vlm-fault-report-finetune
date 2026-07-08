@@ -18,6 +18,7 @@ from perception.screenshot import capture_annotated_screenshot
 from tools.extract import extract_table, get_page_text
 from tools.interact import click, hover, press_key, scroll, select_option, type_text
 from tools.navigate import go_back, go_to_url
+from tools.parallel import extract_from_urls_parallel
 from tools.search import search_web
 from tools.wait import wait
 
@@ -136,6 +137,21 @@ ACTION_SCHEMAS: list[dict] = [
         "parameters": {"type": "object", "properties": {}},
     },
     {
+        "name": "extract_from_urls",
+        "description": (
+            "Open up to 5 URLs concurrently in new tabs and extract their visible text. "
+            "Useful for research/comparison tasks where several pages need to be read at "
+            "once instead of one at a time, e.g. comparing search results or product pages."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "urls": {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["urls"],
+        },
+    },
+    {
         "name": "task_complete",
         "description": "Signal that the task is fully complete and report the final result.",
         "parameters": {
@@ -155,7 +171,7 @@ ACTION_SCHEMAS: list[dict] = [
     },
 ]
 
-_TEXT_RETURNING = {"get_page_text", "search_web", "extract_table"}
+_TEXT_RETURNING = {"get_page_text", "search_web", "extract_table", "extract_from_urls"}
 
 _ActionHandler = Callable[[Any, dict], Awaitable[str | None]]
 
@@ -213,6 +229,10 @@ async def _go_back(page: Any, _: dict) -> None:
     await go_back(page)
 
 
+async def _extract_from_urls(page: Any, args: dict) -> str:
+    return await extract_from_urls_parallel(page, args.get("urls", []))
+
+
 async def _task_complete(_: Any, args: dict) -> str | None:
     return args.get("result")
 
@@ -234,6 +254,7 @@ _ACTION_HANDLERS: dict[str, _ActionHandler] = {
     "search_web": _search_web,
     "extract_table": _extract_table,
     "go_back": _go_back,
+    "extract_from_urls": _extract_from_urls,
     "task_complete": _task_complete,
     "task_failed": _task_failed,
 }

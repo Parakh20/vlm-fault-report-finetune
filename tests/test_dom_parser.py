@@ -1,6 +1,6 @@
 import pytest
 
-from perception.dom_parser import extract_interactive_elements
+from perception.dom_parser import MAX_ELEMENTS, extract_interactive_elements
 
 
 @pytest.mark.asyncio
@@ -83,9 +83,9 @@ async def test_assigns_el_prefix_fallback_id_for_non_native_interactive_tags(
 
 
 @pytest.mark.asyncio
-async def test_truncates_to_max_50_elements(browser_page, static_server, tmp_path):
+async def test_truncates_to_max_elements(browser_page, static_server, tmp_path):
     # Arrange
-    many_buttons = "".join(f'<button id="b{i}">Btn {i}</button>' for i in range(80))
+    many_buttons = "".join(f'<button id="b{i}">Btn {i}</button>' for i in range(150))
     html_path = tmp_path / "many.html"
     html_path.write_text(f"<html><body>{many_buttons}</body></html>")
     await browser_page.goto(html_path.as_uri())
@@ -94,4 +94,22 @@ async def test_truncates_to_max_50_elements(browser_page, static_server, tmp_pat
     elements = await extract_interactive_elements(browser_page)
 
     # Assert
-    assert len(elements) == 50
+    assert len(elements) == MAX_ELEMENTS
+
+
+@pytest.mark.asyncio
+async def test_marks_the_focused_element(browser_page, tmp_path):
+    # Arrange: don't rely on <input autofocus> — Chromium only honors it
+    # with a real user gesture, so focus explicitly instead.
+    html_path = tmp_path / "focus.html"
+    html_path.write_text('<html><body><button id="a">A</button><input id="b"></body></html>')
+    await browser_page.goto(html_path.as_uri())
+    await browser_page.focus("#b")
+
+    # Act
+    elements = await extract_interactive_elements(browser_page)
+
+    # Assert
+    focused = [e for e in elements if e.focused]
+    assert len(focused) == 1
+    assert focused[0].tag == "input"

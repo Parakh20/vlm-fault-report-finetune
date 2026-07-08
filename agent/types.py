@@ -11,6 +11,7 @@ class Element:
     href: str | None
     visible: bool
     bbox: dict               # {"x": float, "y": float, "width": float, "height": float}
+    focused: bool = False    # True if this is document.activeElement
 
 
 @dataclass
@@ -24,6 +25,7 @@ class PageState:
     page_height: int
     dialog_visible: bool
     dialog_text: str | None
+    ocr_text: str = ""       # supplementary OCR pass over the screenshot
 
 
 @dataclass

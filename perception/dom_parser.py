@@ -6,7 +6,7 @@ INTERACTIVE_SELECTOR = (
     "a, button, input, select, textarea, "
     "[role=button], [role=link], [onclick]"
 )
-MAX_ELEMENTS = 50
+MAX_ELEMENTS = 100
 
 _TAG_PREFIX = {
     "a": "link",
@@ -47,6 +47,7 @@ async def extract_interactive_elements(page: Page) -> list[Element]:
         role = (await handle.get_attribute("role")) or ""
         placeholder = await handle.get_attribute("placeholder")
         href = await handle.get_attribute("href")
+        focused = await handle.evaluate("el => el === document.activeElement")
 
         elements.append(
             Element(
@@ -58,6 +59,7 @@ async def extract_interactive_elements(page: Page) -> list[Element]:
                 href=href,
                 visible=True,
                 bbox=bbox,
+                focused=bool(focused),
             )
         )
 

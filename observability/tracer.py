@@ -16,6 +16,20 @@ class Tracer:
         self.dir_path = os.path.join(base_dir, session_id)
         os.makedirs(self.dir_path, exist_ok=True)
         self.trace_path = os.path.join(self.dir_path, "trace.jsonl")
+        self._previous_elements: set[str] | None = None
+
+    def _compute_dom_diff(self, elements: list[str] | None) -> dict | None:
+        if elements is None:
+            return None
+        current = set(elements)
+        diff = None
+        if self._previous_elements is not None:
+            diff = {
+                "added": sorted(current - self._previous_elements),
+                "removed": sorted(self._previous_elements - current),
+            }
+        self._previous_elements = current
+        return diff
 
     def log_step(
         self,
@@ -26,7 +40,9 @@ class Tracer:
         action_result,
         reasoning_text: str,
         tokens_used: int,
+        elements: list[str] | None = None,
     ) -> None:
+        dom_diff = self._compute_dom_diff(elements)
         screenshot_path = None
         if action_result is not None and getattr(action_result, "screenshot_b64", ""):
             screenshot_path = os.path.join(self.dir_path, f"step_{step_n}.png")
@@ -50,6 +66,7 @@ class Tracer:
             "gemini_reasoning": reasoning_text,
             "tokens_used": tokens_used,
             "screenshot_path": screenshot_path,
+            "dom_diff": dom_diff,
         }
 
         with open(self.trace_path, "a", encoding="utf-8") as f:

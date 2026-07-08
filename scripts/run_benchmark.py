@@ -44,13 +44,15 @@ async def run_single_task(
     settings: Settings,
     headless: bool = True,
 ) -> dict:
-    session = BrowserSession()
-    await session.start(headless=headless)
+    session = BrowserSession(engine=settings.browser_engine)
     tracer = Tracer(session_id=task["id"])
+    await session.start(headless=headless, record_video_dir=tracer.dir_path)
+    await session.start_tracing()
     try:
         reasoner = WebAgentReasoner(settings)
         run = await reasoner.run(task["prompt"], session, tracer=tracer)
     finally:
+        await session.stop_tracing(os.path.join(tracer.dir_path, "trace.zip"))
         await session.stop()
 
     judge = LLMJudge(settings)

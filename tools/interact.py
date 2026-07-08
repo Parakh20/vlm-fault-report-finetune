@@ -35,7 +35,7 @@ async def click(page: Page, element_id: str) -> None:
     """Click the element identified by `element_id`."""
     handle = await _handle_for(page, element_id)
     await handle.scroll_into_view_if_needed()
-    await handle.click()
+    await handle.click(force=True)
     await page.wait_for_load_state("domcontentloaded", timeout=5000)
 
 
@@ -46,7 +46,7 @@ async def type_text(page: Page, element_id: str, text: str, clear_first: bool = 
     """
     handle = await _handle_for(page, element_id)
     await handle.scroll_into_view_if_needed()
-    await handle.click()
+    await handle.click(force=True)
     if clear_first:
         await page.keyboard.press("Control+A")
         await page.keyboard.press("Backspace")

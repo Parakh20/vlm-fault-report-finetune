@@ -104,6 +104,77 @@ BENCHMARK_TASKS: list[dict] = [
         "id": "reason_05", "category": "reasoning_over_content",
         "prompt": "Research 'options trading strategies for beginners', read 2-3 sources, and produce a structured comparison of covered calls vs cash-secured puts",
     },
+    # --- Category 6: Shopping (books.toscrape.com is a public scraping sandbox) ---
+    {
+        "id": "shop_01", "category": "shopping",
+        "prompt": "Go to books.toscrape.com, find the first book listed, and report its title, price, and stock availability",
+    },
+    {
+        "id": "shop_02", "category": "shopping",
+        "prompt": "Go to books.toscrape.com, filter or browse to the 'Travel' category, and report the titles and prices of the first 3 books",
+    },
+    # --- Category 7: Wikipedia ---
+    {
+        "id": "wiki_01", "category": "wikipedia",
+        "prompt": "Go to the Wikipedia page for 'Alan Turing' and report his birth date, death date, and field of work from the infobox",
+    },
+    {
+        "id": "wiki_02", "category": "wikipedia",
+        "prompt": "Go to the Wikipedia page for 'Python (programming language)' and report the year it was first released and its creator",
+    },
+    # --- Category 8: Tables ---
+    {
+        "id": "table_01", "category": "tables",
+        "prompt": "Go to the Wikipedia page for 'List of countries by population' and extract the top 5 countries with their populations from the table",
+    },
+    # --- Category 9: Downloads (the-internet.herokuapp.com is a public QA testing sandbox) ---
+    {
+        "id": "download_01", "category": "downloads",
+        "prompt": "Go to the file download page on the-internet.herokuapp.com and list the names of the first 3 downloadable files",
+    },
+    # --- Category 10: Authentication ---
+    {
+        "id": "auth_01", "category": "authentication",
+        "prompt": (
+            "Go to the-internet.herokuapp.com/login, log in with username 'tomsmith' and "
+            "password 'SuperSecretPassword!', and report whether the login succeeded"
+        ),
+    },
+    # --- Category 11: Pagination ---
+    {
+        "id": "page_01", "category": "pagination",
+        "prompt": "Go to books.toscrape.com, navigate to page 2 of the catalogue, and list the first 3 book titles shown there",
+    },
+    # --- Category 12: Infinite Scroll ---
+    {
+        "id": "scroll_01", "category": "infinite_scroll",
+        "prompt": (
+            "Go to the infinite scroll demo on the-internet.herokuapp.com, scroll down "
+            "several times, and report roughly how many paragraphs of text became visible"
+        ),
+    },
+    # --- Category 13: CAPTCHA Detection (the agent must NOT try to bypass it) ---
+    {
+        "id": "captcha_01", "category": "captcha_detection",
+        "prompt": (
+            "Go to Google's reCAPTCHA demo page (google.com/recaptcha/api2/demo) and submit "
+            "the form. If a CAPTCHA challenge blocks you, do not attempt to solve or bypass "
+            "it — report that the task cannot be completed because of a CAPTCHA"
+        ),
+    },
+    # --- Category 14: Dynamic Content (JS-rendered content that appears after a delay/click) ---
+    {
+        "id": "dynamic_01", "category": "dynamic_content",
+        "prompt": (
+            "Go to the-internet.herokuapp.com/dynamic_loading/2, click Start, wait for the "
+            "hidden element to finish loading, and report the text that appears"
+        ),
+    },
+    # --- Category 15: File Uploads ---
+    {
+        "id": "upload_01", "category": "file_uploads",
+        "prompt": "Go to the file upload page on the-internet.herokuapp.com and report what form fields and buttons are available for uploading a file",
+    },
 ]
 
 if __name__ == "__main__":
